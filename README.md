@@ -192,5 +192,6 @@ READ ME
 
 
 	### Notes: G.Df and G.Cf are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through G.getFundamentalMatrices().
+		 :Currently, the only supported components for the component matrix are resistors, inductors and capacitors. Therefore, to make use of the solving of this matrix equation, the circuit can only contain these components + sources. Further, if OCR does not identify these components correctly, the matrix equation and matrices will likely fail and throw an error. 
 
 
