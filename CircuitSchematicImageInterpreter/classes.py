@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 All Classes
 ===========
@@ -33,9 +32,10 @@ class Image:
         self.image = image
         self.binaryImage = binaryConversion(self.image)
         self.binarySkeleton = binarySkeleton(self.image)
+        self.cleanedImage = []
         self.width = image.shape[1]
         self.height = image.shape[0]
-        self.center = (int(self.width / 2), int(self.height / 2))
+        self.centre = (int(self.width / 2), int(self.height / 2))
         self.size = np.size(image)
         self.path = path
 
@@ -67,12 +67,12 @@ class Image:
         return self
 
     # Plots found components
-    def plotComponents(self, Components, img):
+    def plotComponents(self, Components, image):
         for i in range(len(Components)):
             print(Components[i].componentType)
             y, x = Components[i].centroid
             plt.scatter(x, y, c='r', s=10)
-            top, bottom, left, right = Components[i].getRegion(img)
+            top, bottom, left, right = Components[i].getRegion(image)
             plt.plot((left, right), (top, top), c='r')
             plt.plot((left, right), (bottom, bottom), c='r')
             plt.plot((left, left), (top, bottom), c='r')
@@ -194,6 +194,50 @@ class Image:
             top, bottom, left, right = wire.line
             plt.plot((left, right), (top, bottom))
         return self, G
+
+    # Plots the blue bounding box of all detected ground symbols
+    def plotGround(self, groundSymbols):
+
+        for symbol in groundSymbols:
+            top, bottom, left, right = symbol[0], symbol[1], symbol[2], symbol[3]
+
+            plt.plot((left, right), (top, top), c='b')
+            plt.plot((left, right), (bottom, bottom), c='b')
+            plt.plot((left, left), (top, bottom), c='b')
+            plt.plot((right, right), (top, bottom), c='b')
+
+    # Plots the original image with marked crop region, and, the cropped image
+    def plotLabels(self, labels, text=False):
+
+        strings, boxes = labels
+        plt.close('all')
+
+        # Generating figure
+        fig, axes = plt.subplots(ncols=2, figsize=(15, 6.5))
+        ax = axes.ravel()
+
+        ax[0].set_xlim((0, self.width))
+        ax[0].set_ylim((self.height, 0))
+        ax[0].set_title('Original Image')
+        ax[1].set_title(self.path + ' | Cropped' + ' | Text = ' + str(text))
+
+        # plotting box
+
+        for idx, box in enumerate(boxes):
+            char = strings[idx]
+            top, bottom, left, right = box
+
+            ax[0].plot((left, right), (top, top), c='r')
+            ax[0].plot((left, right), (bottom, bottom), c='r')
+            ax[0].plot((left, left), (top, bottom), c='r')
+            ax[0].plot((right, right), (top, bottom), c='r')
+            if text:
+                ax[0].text(left + int((right - left) / 2), (top - 2), char, c='b')
+
+        ax[0].imshow(self.image, cmap=cm.gray)
+        ax[1].imshow(self.cleanedImage, cmap=cm.gray)
+
+        plt.show()
 
 
 # Network X matrix handling class
@@ -470,10 +514,10 @@ class Graph:
 
         return componentEQ_Df_Cf_Matrix, combinedColumnVector, resultColumnVector
 
-    def getComponentEquations(self, matrices=False):
-        H, x, y = self.componentMatrix(self.componentList)
+    def getComponentEquations(self, components, matrices=False):
+        H, x, y = self.componentMatrix(components)
         componentEquations = Matrix.hstack(
-            (nsimplify(Matrix(np.identity(2 * len(self.componentList))) * (H.inv() * y)).evalf(3)),
+            (nsimplify(Matrix(np.identity(2 * len(components))) * (H.inv() * y)).evalf(3)),
             Matrix(x)).evalf(3)
         if matrices:
             return H, x, y, componentEquations
@@ -494,6 +538,8 @@ class Component:
         self.isVert = False
         self.associatedHWires = []
         self.associatedVWires = []
+        self.nodes = []
+        self.edge = []
         self.componentType = ''
         self.unichar = ''
         self.terminalNo = 2
@@ -546,6 +592,10 @@ class WireHoriz:
         self.line = y1, y2, x1, x2
         self.start = y1, x1
         self.end = y2, x2
+        self.junctionStart = False
+        self.junctionEnd = False
+        self.componentStart = False
+        self.componentEnd = False
 
     def getBorder(self):
         rows = np.any(self.wire, axis=0)
@@ -565,6 +615,10 @@ class WireVert:
         self.line = y1, y2, x1, x2
         self.start = y1, x1
         self.end = y2, x2
+        self.junctionStart = False
+        self.junctionEnd = False
+        self.componentStart = False
+        self.componentEnd = False
 
     def getBorder(self):
         rows = np.any(self.wire, axis=0)
@@ -581,7 +635,6 @@ class WireJunctions:
         self.id = ''
         self.id_node = ''
         self.centroid = centroid[0], centroid[1]
-        self.terminals = 0
         self.directions = 'NIL'  # N, S, E, W ->> north is up, south is down, west/east are left/right
         self.type = 'NIL'  # Corner, tri junction, quad junction
         self.associatedHWires = []

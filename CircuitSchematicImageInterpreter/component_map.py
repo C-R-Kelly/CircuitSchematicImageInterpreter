@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Component List
 ==============
@@ -9,6 +8,12 @@ author: C. R. Kelly
 email: CK598@cam.ac.uk
 
 """
+
+
+
+
+
+
 def getComponents():
 # component name, OCR Value, Number of Terminals
     COMPONENT_LIST = [

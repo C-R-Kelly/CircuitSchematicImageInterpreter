@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 I/O Functions
 =============
@@ -74,4 +73,84 @@ def exportComponent(originalImage, components, EXTENSION=config.extension):
         io.imsave(filePath, image, plugin='pil', dpi=config.exportDPI)
 
 
+def exportFoundBox(originalImage, foundBoxes, EXTENSION=config.extension):
+    """
+    :param EXTENSION: String: File output extension
+    :param originalImage: NDARRAY: original input image
+    :param foundBoxes: list of identified boxes
+    :return:
+    """
+    for boxes in foundBoxes:
+        top, bottom, left, right = boxes.box
+        top -= 7
+        bottom += 7
+        left -= 7
+        right += 7
+        image = img_as_ubyte(originalImage.image[top:bottom, left:right])
+        filePath = config.exportPath + '\\' + originalImage.name + '\\Ics\\'
+        print("True")
+        if os.path.exists(filePath):
+            filePath = config.exportPath + '\\' + originalImage.name + '\\Ics\\' + str(boxes.id) + EXTENSION
+            io.imsave(filePath, image, plugin='pil', dpi=config.exportDPI)
+        else:
 
+            os.makedirs(filePath)
+            filePath = config.exportPath + '\\' + originalImage.name + '\\Ics\\' + str(boxes.id) + EXTENSION
+            io.imsave(filePath, image, plugin='pil', dpi=config.exportDPI)
+
+
+def importTemplate(path):
+    """ Imports a saved cropped template and converts it into grayscale.
+
+    :param path: str: File path of the image.
+    :return image: ndarray: Grayscale conversion of imported image.
+    """
+    image = io.imread(path)
+    if not len(image.shape) == 2:
+
+        dim3 = image.shape[2]
+        if dim3 == 4:
+            image = rgba2rgb(image)
+            image = rgb2gray(image)
+
+            return image
+
+        elif dim3 == 3:
+            image = rgb2gray(image)
+            return image
+
+        else:
+            return image
+    else:
+        return image
+
+
+def exportTemplate(template, imageName):
+    templateNumber = 0
+    dirPath = os.path.join(config.exportPath, 'templates', imageName)
+    filePath = os.path.join(dirPath, 'template_' + str(templateNumber) + config.extension)
+    # export template
+    # number templates 0 to ...
+    # number should then coincide with bounding boxes in boxes list, ie box[0] will contain x bboxes for every match inc original template
+    # export template with original image extension
+    # may have to add image dtype check and create custom importtemplate if importimage() doesn't work
+    #
+
+    if not os.path.exists(dirPath):
+        os.makedirs(dirPath)
+
+    while os.path.exists(filePath):
+        templateNumber = templateNumber + 1
+        filePath = os.path.join(dirPath, 'template_' + str(templateNumber) + config.extension)
+
+    io.imsave(filePath, template, plugin='pil', dpi=config.exportDPI)
+
+
+def getNewImageCopy(image):
+    path = image.path
+    newImage = importTemplate(path)
+    return newImage
+
+def getImageCopy(image):
+    newImage = getNewImageCopy(image)
+    return newImage

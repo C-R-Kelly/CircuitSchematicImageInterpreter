@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 NetworkX
 ========
@@ -11,8 +10,8 @@ email: CK598@cam.ac.uk
 """
 import networkx as nx
 
-from .config import Config
 
+from .config import Config
 config = Config()
 
 
@@ -26,7 +25,7 @@ class Nodes:
 
 
 def getNodeSubsets(nodes):
-    """ Assign associated multi partite subsets to node.subset_id for every node
+    """ Assign associated multipartite subsets to node.subset_id for every node
 
     :param nodes: list: List of nodes returned by getNodes(junctions)
 
@@ -49,10 +48,11 @@ def getNodeSubsets(nodes):
     # bubble sort to have node list in increasing order of y values
     for i in range(len(nodeTempList) ** 2):
         for j in range(len(nodeTempList) - 1):
-            if nodeTempList[j][1] > nodeTempList[j + 1][1]:
+            if nodeTempList[j][1] > nodeTempList[j+1][1]:
+
                 a0 = nodeTempList[j][0], nodeTempList[j][1]
-                a1 = nodeTempList[j + 1][0], nodeTempList[j + 1][1]
-                nodeTempList[j], nodeTempList[j + 1] = a1, a0
+                a1 = nodeTempList[j+1][0], nodeTempList[j+1][1]
+                nodeTempList[j], nodeTempList[j+1] = a1, a0
 
     # write function to set node.subset to value
 
@@ -154,7 +154,7 @@ def getNodes(junctions):
     for junction in junctions:
 
         # Adding Nodes into list
-        if junction.isNode:
+        if junction.isNode == True:
             node = Nodes(junction.id_node)
             node.associatedHWires = junction.associatedHWires
             node.associatedVWires = junction.associatedVWires
@@ -178,13 +178,15 @@ def getNodes(junctions):
     label = 'A'
     for node in nodes:
         node.id = label
-        label = chr(ord(label) + 1)
+        label = chr(ord(label)+1)
 
     # assign node.subset to node subset
     getNodeSubsets(nodes)
 
     # reverse node list so graph plots left to right, top to bottom
     nodes = nodes[::-1]
+
+
 
     return nodes
 
@@ -234,27 +236,32 @@ def getEdges(nodes, components):
     edges = list(edges)
     for edgepos in range(len(edges)):
         if edges.count(edges[edgepos]) > 1:
-            for edgepos2 in range(edgepos + 1, len(edges)):
+            for edgepos2 in range(edgepos+1, len(edges)):
                 if edges.count(edges[edgepos2]) > 1:
                     value0, value1 = edges[edgepos2][0], edges[edgepos2][1]
                     edges[edgepos2] = (value1, value0)
 
-    # set edge labels
+    # set edge labels, assign edge and nodes to component class
     edge_label = 0
     for edge in edges:
         node1 = edge[0]
         node2 = edge[1]
         edge = (node1, node2, edge_label, {'edge_label': str(edge_label)})
         labelledEdges.append(edge)
-        edge_label += 1
 
+        for component in components:
+            if edge_label == component.id:
+                nodes = node1, node2
+                component.edge = edge_label
+                component.nodes = nodes
+
+        edge_label += 1
     return labelledEdges
 
 
 def displayNetworkGraph(junctions, components, multipartiteLayout=True):
     """ Draws network graph of circuit schematic
 
-        :param multipartiteLayout: boolean: Decide whether to use multipartite layout for graph plotting
         :param junctions: list: List of junctions returned by junctionDetectinon(HorizWires, VertWires)
         :param components: list: List of components returned by objectDetection(HorizWires, VertWires, image, maximumDistance=config.maximumDistance, minimumDistance=config.minimumDistance)
         :return labels: list: List of edge labels

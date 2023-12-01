@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Image Processing
 ================
@@ -18,7 +17,10 @@ from skimage.morphology import skeletonize
 
 from PIL import Image, ImageOps
 
+#from .actions import getNewImageCopy
 from .config import Config
+#from .io import importTemplate
+
 config = Config()
 
 
@@ -61,3 +63,7 @@ def addBorder(width=4, path=config.exportPath):
         print(str(inputImage) + ' ----> ' + str(outputImage))
 
     return imageNames
+
+
+
+

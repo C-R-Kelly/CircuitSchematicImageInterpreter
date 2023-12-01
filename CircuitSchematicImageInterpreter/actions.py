@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Segmentation Actions
 ====================
@@ -12,10 +11,14 @@ email: CK598@cam.ac.uk
 import numpy as np
 import math
 
+from skimage.feature import peak_local_max, match_template
+from skimage.transform import probabilistic_hough_line, rotate
+import os
 
-from skimage.transform import probabilistic_hough_line
 from .classes import HorizontalLines, VerticalLines, WireHoriz, WireVert, Component, WireJunctions
+from .io import importTemplate, exportTemplate, getNewImageCopy
 from .config import Config
+
 
 config = Config()
 
@@ -84,7 +87,7 @@ def sortLines(lines):
     return horizLines, vertLines
 
 
-def wireDetect(border1, border2, threshold=config.threshold):
+def wireDetect(border1, border2, wire, threshold=config.threshold):
     """ Detecting whether a wire is present based on a set of parameters
 
     :param border1: ndarray: Cropped segment of left/top side of the wire.
@@ -95,9 +98,12 @@ def wireDetect(border1, border2, threshold=config.threshold):
     """
     border1Size = np.size(border1)
     border2Size = np.size(border2)
-    b1Sum = float(np.sum(border1))
-    b2Sum = float(np.sum(border2))
+    wireSize = np.size(wire)
+    b1Sum = np.float(np.sum(border1))
+    b2Sum = np.float(np.sum(border2))
+    wireSum = np.float(np.sum(wire))
 
+    # if b1Sum / border1Size <= threshold and b2Sum / border2Size <= threshold and wireSum / wireSize == 1:
     if border1Size > 0 and border2Size > 0:
         if b1Sum / border1Size <= threshold and b2Sum / border2Size <= threshold:
             return True
@@ -114,7 +120,8 @@ def wireCheck(Wires, Wire):
     for wire in Wires:
         wires.append(wire.line)
     for wire in wires:
-        if abs(wire[0] - Wire.line[0]) <= delta and abs(wire[1] - Wire.line[1]) <= delta and abs(wire[2] - Wire.line[2]) <= delta and abs(wire[3] - Wire.line[3]) <= delta:
+        if abs(wire[0] - Wire.line[0]) <= delta and abs(wire[1] - Wire.line[1]) <= delta and abs(
+                wire[2] - Wire.line[2]) <= delta and abs(wire[3] - Wire.line[3]) <= delta:
             duplicateWire = True
     return duplicateWire
 
@@ -122,7 +129,7 @@ def wireCheck(Wires, Wire):
 def wireScanHough(image, minWireLength=10, borderSize=15):
     """ Scans for wires using Hough's transform
 
-    :param image: class object: Image of circuit figure
+    :param binarySkeleton: ndarray: Binarised skeletonized image of circuit diagram
     :param minWireLength: int: minimum length before found line is counted as a wire
     :param borderSize: int: amount of empty space in pixels at the normal of the found line in both directions before  line is counted as wire
     :return: ndarray: Binary converted image.
@@ -153,8 +160,7 @@ def wireScanHough(image, minWireLength=10, borderSize=15):
             border1 = image.binarySkeleton[top:line.start[0], left:right]
             border2 = image.binarySkeleton[line.start[0] + 1:bottom, left:right]
 
-            wirePresent = wireDetect(border1, border2)
-
+            wirePresent = wireDetect(border1, border2, wire)
             if wirePresent:
                 wire = WireHoriz(line.start[0], line.start[0], left, right, image.binarySkeleton)
                 if not wireCheck(HorizWires, wire):
@@ -173,11 +179,11 @@ def wireScanHough(image, minWireLength=10, borderSize=15):
             else:
                 left, right, = line.start[1] - borderSize, line.start[1] + borderSize
 
+            wire = image.binarySkeleton[top:bottom, line.start[1]:line.start[1] + 1]
             border1 = image.binarySkeleton[top:bottom, left:line.start[1]]
             border2 = image.binarySkeleton[top:bottom, line.start[1] + 1:right]
 
-            wirePresent = wireDetect(border1, border2)
-
+            wirePresent = wireDetect(border1, border2, wire)
             if wirePresent:
                 wire = WireVert(top, bottom, line.start[1], line.start[1], image.binarySkeleton)
                 if not wireCheck(VertWires, wire):
@@ -211,14 +217,14 @@ def wireAdd(start, end, HorizWires, VertWires, image):
         return
 
 
-def objectDetection(HorizWires, VertWires,  maximumDistance=config.maximumDistance,
+def objectDetection(HorizWires, VertWires, maximumDistance=config.maximumDistance,
                     minimumDistance=config.minimumDistance):
     """ Detects if objects are present between found wires.
 
-    :param maximumDistance: int: If the start and ends of two wires are further apart than this distance then a check will not be performed.
-    :param minimumDistance: int: If the start and end of two wires are closer than this distance then a check will not be performed.
+    :param maximumDistance: int: If the ends of two wires are further apart than this distance then a check will not be performed.
     :param HorizWires: list: List of horizontal wires returned by the HorizWires class.
     :param VertWires: list: List of vertical wires returned by the Vert class.
+    :param image: class: Class of circuit diagram image
     :return list: Returns a list of found components
     """
     # Detecting objects between detected wires
@@ -227,8 +233,8 @@ def objectDetection(HorizWires, VertWires,  maximumDistance=config.maximumDistan
         y1, x1 = HorizWires[i].end
         y2, x2 = HorizWires[i + 1].start
         dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)  # euclidean distance
-        dist = abs(x2-x1)  # linear plane distance
-        if maximumDistance > dist > minimumDistance and abs(y1-y2) < 3:
+        dist = abs(x2 - x1)  # linear plane distance
+        if maximumDistance > dist > minimumDistance and abs(y1 - y2) < 3:
             centroid = int(y2 - (0.5 * (y2 - y1))), int(x2 - (0.5 * (x2 - x1)))
             component = Component(centroid)
             component.Width = int(dist) + config.bboxOffset  # offset paramter for bbox
@@ -238,13 +244,15 @@ def objectDetection(HorizWires, VertWires,  maximumDistance=config.maximumDistan
             component.id = currentLocation
             component.associatedHWires.append(HorizWires[i])
             component.associatedHWires.append(HorizWires[i + 1])
+            HorizWires[i].componentEnd = True
+            HorizWires[i + 1].componentStart = True
 
     for i in range(len(VertWires) - 1):
         y1, x1 = VertWires[i].end
         y2, x2 = VertWires[i + 1].start
-        dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)   # euclidean distance
-        dist = abs(y2-y1)  # linear plane distance
-        if maximumDistance > dist > minimumDistance and abs(x1-x2) < 3:
+        dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)  # euclidean distance
+        dist = abs(y2 - y1)  # linear plane distance
+        if maximumDistance > dist > minimumDistance and abs(x1 - x2) < 3:
             centroid = int(y2 - (0.5 * (y2 - y1))), int(x2 - (0.5 * (x2 - x1)))
             component = Component(centroid)
             component.Height = int(dist) + config.bboxOffset  # offset parameter for bbox, default was 15
@@ -254,6 +262,8 @@ def objectDetection(HorizWires, VertWires,  maximumDistance=config.maximumDistan
             component.isVert = True
             component.associatedVWires.append(VertWires[i])
             component.associatedVWires.append(VertWires[i + 1])
+            VertWires[i].componentEnd = True
+            VertWires[i + 1].componentStart = True
 
     return foundComponents
 
@@ -267,7 +277,7 @@ def junctionDetection(HorizWires, VertWires):
     """
 
     maxDistance = 5
-    maxDistance = maxDistance**2
+    maxDistance = maxDistance ** 2
     foundJunctions = []
     id = 65  # ASCII VALUE
     for horizWire in HorizWires:
@@ -283,6 +293,8 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 2
                 Junction.type = 'Corner'
+                horizWire.junctionStart = True
+                vertWire.junctionStart = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -295,6 +307,8 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 2
                 Junction.type = 'Corner'
+                horizWire.junctionStart = True
+                vertWire.junctionEnd = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -307,6 +321,8 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 2
                 Junction.type = 'Corner'
+                horizWire.junctionEnd = True
+                vertWire.junctionStart = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -319,6 +335,8 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 2
                 Junction.type = 'Corner'
+                horizWire.junctionEnd = True
+                vertWire.junctionEnd = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -332,6 +350,7 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 3
                 Junction.type = 'Tri'
+                horizWire.junctionStart = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -344,6 +363,7 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 3
                 Junction.type = 'Tri'
+                horizWire.junctionEnd = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -357,6 +377,7 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 3
                 Junction.type = 'Tri'
+                vertWire.junctionStart = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -369,6 +390,7 @@ def junctionDetection(HorizWires, VertWires):
                 Junction = WireJunctions(centroid)
                 Junction.terminals = 3
                 Junction.type = 'Tri'
+                vertWire.junctionEnd = True
                 Junction.associatedHWires.append(horizWire)
                 Junction.associatedVWires.append(vertWire)
                 foundJunctions.append(Junction)
@@ -390,4 +412,201 @@ def junctionDetection(HorizWires, VertWires):
     return foundJunctions
 
 
+def templateMatch(template, image):
+    """ Uses a template image to find reoccuring instances of said template in the image it was taken .
+
+    :param template: ndarray: cropped segment of original image to be used for template matching.
+    :param image:  ndarray: original input image where template was taken from.
+    :return image: ndarray: input image with areas with detected matches removed .
+    """
+    # match template, remove found matches
+    result = match_template(image, template)
+    pairs = peak_local_max(result, min_distance=1, threshold_abs=0.8)
+
+    return pairs
+
+
+def groundSymbolCheck(wire, direction, image):
+    top, bottom, left, right = 0, 0, 0, 0
+
+    # get length and threshold from config
+    height = config.groundInspectionAreaHeight
+    width = config.groundInspectionAreaWidth
+    threshold = config.groundInspectionThreshold
+    emptyBbox = 0, 0, 0, 0
+    # find if wire is horizontal or vertical
+    if abs(wire.start[0] - wire.end[0]) < 2:
+        Horizontal = True
+    else:
+        Horizontal = False
+
+    # area inspection
+    if Horizontal:
+        if direction == 'start':
+            top, bottom, left, right = wire.start[0] - height, wire.start[0] + height, wire.start[1] - (2 * width), \
+                                       wire.start[1]
+
+        elif direction == 'end':
+            top, bottom, left, right = wire.end[0] - height, wire.end[0] + height, wire.end[1], wire.end[
+                1] + (2 * width)
+
+    elif not Horizontal:
+        if direction == 'start':
+            top, bottom, left, right = wire.start[0] - (2 * height), wire.start[0], wire.start[1] - width, wire.start[
+                1] + width
+
+        elif direction == 'end':
+            top, bottom, left, right = wire.end[0], wire.end[0] + (2 * height), wire.end[1] - width, wire.end[
+                1] + width
+
+    # checking if area exceeds bounds of image
+
+    if top <= 0 or bottom >= image.shape[0] or left <= 0 or right >= image.shape[1]:
+        return False, emptyBbox
+
+    area = image[top:bottom, left:right]
+    value = 1 - (float(np.sum(area)) / ((2 * width * 2 * height)))
+
+    if value >= threshold:
+        print(value)
+        bbox = top, bottom, left, right
+        return True, bbox
+    else:
+        return False, emptyBbox
+
+
+def groundSymbolDetection(HorizWires, VertWires, image):
+    # Delete template image files instead of storing them
+    deleteTemplateFiles = True
+
+    activeImage = image.image
+    groundSymbols = []
+    checkList = []
+    templates = []
+    templateBoxes = []
+    for HorizWire in HorizWires:
+        if not HorizWire.componentStart and not HorizWire.junctionStart:
+            # add wire to list to show its been checked
+            checkList.append(HorizWire)
+            # perform check for ground symbol
+            check, bbox = groundSymbolCheck(HorizWire, 'start', activeImage)
+
+            if check:
+                boxes = []
+                top, bottom, left, right = bbox
+                height = bottom - top
+                width = right - left
+                # once ground symbol is found, look for duplicates w/ template matching
+                foundTemplates = templateMatch(activeImage[top:bottom, left:right], activeImage)
+                # export template for later replacement
+                exportTemplate(activeImage[top:bottom, left:right], image.name)
+                for template in foundTemplates:
+                    # append results to list, crop out templates from existing image
+                    bbox = template[0], template[0] + height, template[1], template[1] + width
+                    boxes.append(bbox)
+                    result = bbox
+                    groundSymbols.append(result)
+                    activeImage[template[0]:template[0] + height, template[1]:template[1] + width] = 1
+                templateBoxes.append(boxes)
+
+        elif not HorizWire.componentEnd and not HorizWire.junctionEnd:
+            # add wire to list to show its been checked
+            checkList.append(HorizWire)
+            # perform check for ground symbol
+            check, bbox = groundSymbolCheck(HorizWire, 'end', activeImage)
+
+            if check:
+                boxes = []
+                top, bottom, left, right = bbox
+                height = bottom - top
+                width = right - left
+                # once ground symbol is found, look for duplicates w/ template matching
+                foundTemplates = templateMatch(activeImage[top:bottom, left:right], activeImage)
+                # export template for later replacement
+                exportTemplate(activeImage[top:bottom, left:right], image.name)
+                for template in foundTemplates:
+                    # append results to list, crop out templates from existing image
+                    bbox = template[0], template[0] + height, template[1], template[1] + width
+                    boxes.append(bbox)
+                    result = bbox
+                    groundSymbols.append(result)
+                    activeImage[template[0]:template[0] + height, template[1]:template[1] + width] = 1
+                templateBoxes.append(boxes)
+
+    for VertWire in VertWires:
+        if not VertWire.componentStart and not VertWire.junctionStart:
+            # add wire to list to show its been checked
+            checkList.append(VertWire)
+            # perform check for ground symbol
+            check, bbox = groundSymbolCheck(VertWire, 'start', activeImage)
+
+            if check:
+                boxes = []
+                top, bottom, left, right = bbox
+                height = bottom - top
+                width = right - left
+                # once ground symbol is found, look for duplicates w/ template matching
+                foundTemplates = templateMatch(activeImage[top:bottom, left:right], activeImage)
+                # export template for later replacement
+                exportTemplate(activeImage[top:bottom, left:right], image.name)
+                for template in foundTemplates:
+                    # append results to list, crop out templates from existing image
+                    bbox = template[0], template[0] + height, template[1], template[1] + width
+                    boxes.append(bbox)
+                    result = bbox
+                    groundSymbols.append(result)
+                    activeImage[template[0]:template[0] + height, template[1]:template[1] + width] = 1
+                templateBoxes.append(boxes)
+
+        elif not VertWire.componentEnd and not VertWire.junctionEnd:
+            # add wire to list to show its been checked
+            checkList.append(VertWire)
+            # perform check for ground symbol
+            check, bbox = groundSymbolCheck(VertWire, 'end', activeImage)
+
+            if check:
+                boxes = []
+                top, bottom, left, right = bbox
+                height = bottom - top
+                width = right - left
+                # once ground symbol is found, look for duplicates w/ template matching
+                foundTemplates = templateMatch(activeImage[top:bottom, left:right], activeImage)
+                # export template for later replacement
+                exportTemplate(activeImage[top:bottom, left:right], image.name)
+                for template in foundTemplates:
+                    # append results to list, crop out templates from existing image
+                    bbox = template[0], template[0] + height, template[1], template[1] + width
+                    boxes.append(bbox)
+                    result = bbox
+                    groundSymbols.append(result)
+                    activeImage[template[0]:template[0] + height, template[1]:template[1] + width] = 1
+                templateBoxes.append(boxes)
+
+    # deleting cropped templates
+    if deleteTemplateFiles:
+        for templateNumber, templateBox in enumerate(templateBoxes):
+            filePath = os.path.join(config.exportPath, 'templates', image.name, 'template_' + str(templateNumber) + config.extension)
+            os.remove(filePath)
+
+    # re-import original image and map to image.image to reverse template cropping
+    filePath = image.path
+    image.image = importTemplate(filePath)
+
+    return groundSymbols, templates
+
+
+
+def cleanLabels(labels, image):
+    '''
+    :param image:
+    :param labels:
+    :return:
+    '''
+    croppedImage = getNewImageCopy(image)
+    strings, boxes = labels
+    for box in boxes:
+        top, bottom, left, right = box
+        croppedImage[top:bottom, left:right] = 1
+    image.cleanedImage = croppedImage
+    return croppedImage
 

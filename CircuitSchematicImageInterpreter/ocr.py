@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tesseract OCR
 =============
@@ -18,20 +17,24 @@ from scipy.ndimage import rotate
 
 from os import path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageDraw, ImageOps
 
 import pytesseract as pyt
 
 from .config import Config
 from .component_map import getComponents
-
 config = Config()
 
-LANG_MODEL = config.langModel
-CONFIG = config.configLine
+
+LANG_MODEL_SYMBOLS = config.langModelSymbols
+CONFIG_SYMBOLS = config.configLineSymbols
+
+LANG_MODEL_LABELS = config.langModelLabels
+CONFIG_LABELS = config.labelsPSM + config.configLineLabels
+
 
 # Initialising Tesseract
-pyt.pytesseract.tesseract_cmd = config.TessPath
+pyt.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 
 def OCR(OCR_Result):
@@ -51,7 +54,6 @@ def OCR(OCR_Result):
 def OCRComponents(components, Display=config.display):
     """ Compiles & rotates all found components into a single horizontal image and applies Tesseract OCR
 
-    :param Display: boolean: display graphical OCR results
     :param components: list: List of found component classes
     :return nil:
     """
@@ -85,12 +87,12 @@ def OCRComponents(components, Display=config.display):
     FULL_IMAGE = np.array(FULL_IMAGE)
 
     # Performing Tesseract OCR
-    OCR_Result = pyt.image_to_string(FULL_IMAGE, lang=LANG_MODEL, config=CONFIG)
+    OCR_Result = pyt.image_to_string(FULL_IMAGE, lang=LANG_MODEL_SYMBOLS, config=CONFIG_SYMBOLS)
     OCR_Result = OCR_Result.split('\n')
     OCR_Result = list(OCR_Result[0])
 
     if Display:
-        foundTextAsBoxes_1 = pyt.image_to_boxes(FULL_IMAGE, lang=LANG_MODEL, config=CONFIG)
+        foundTextAsBoxes_1 = pyt.image_to_boxes(FULL_IMAGE, lang=LANG_MODEL_SYMBOLS, config=CONFIG_SYMBOLS)
         foundTextAsBoxes_1 = foundTextAsBoxes_1.splitlines()
         #### FIGURE GENERATION
         # Generating figure
@@ -101,7 +103,7 @@ def OCRComponents(components, Display=config.display):
 
         ax.set_xlim((0, FULL_IMAGE.shape[1]))
         ax.set_ylim((FULL_IMAGE.shape[0], 0))
-        # ax.set_title('Model: ' + LANG_MODEL + ' | Image: OCR_Boxes.png' + ' | OCR RESULT')
+        #ax.set_title('Model: ' + LANG_MODEL + ' | Image: OCR_Boxes.png' + ' | OCR RESULT')
         ax.imshow(FULL_IMAGE, cmap=plt.cm.gray)
 
         # plotting box
@@ -109,8 +111,7 @@ def OCRComponents(components, Display=config.display):
             bboxData = boxes.split(' ')
             # bboxData = foundTextAsBoxes_1[1].split(' ')
             char = bboxData[0]
-            bbox = FULL_IMAGE.shape[0] - int(bboxData[4]), FULL_IMAGE.shape[0] - int(bboxData[2]), int(
-                bboxData[1]), int(
+            bbox = FULL_IMAGE.shape[0] - int(bboxData[4]), FULL_IMAGE.shape[0] - int(bboxData[2]), int(bboxData[1]), int(
                 bboxData[3])
 
             top, bottom, left, right = bbox
@@ -123,11 +124,44 @@ def OCRComponents(components, Display=config.display):
         plt.show()
         plt.savefig(path.join(config.exportPath, 'OCR_Boxes.png'))
 
+
     # Identifying each component, its unichar and No. of terminals
     for i in range(len(OCR_Result)):
         foundComponent = OCR(OCR_Result[i])
         if i < len(components):
             components[i].componentType = foundComponent[0]
             components[i].unichar = foundComponent[1]
-            # components[i].terminalNo = foundComponent[2]
+            #components[i].terminalNo = foundComponent[2]
             components[i].terminalNo = 2
+
+
+def discoverLabels(image):
+    """
+    :param binaryImage: ndarray: binary image of circuit diagram
+    :return: labels: list: list of two other lists, one with the strings of detected chars, the other with bounding boxes
+    """
+    boxes = []
+    chars = []
+
+    strings = pyt.image_to_string(image.binaryImage, lang=LANG_MODEL_LABELS, config=CONFIG_LABELS)
+    strings.split('\n')
+    foundBoxes = pyt.image_to_boxes(image.binaryImage, lang=LANG_MODEL_LABELS, config=CONFIG_LABELS)
+    foundBoxes = foundBoxes.splitlines()
+
+    for bbox in foundBoxes:
+        bbox = bbox.split(' ')
+        print(bbox)
+        char = bbox[0]
+        boxCoords = image.height - int(bbox[4]), image.height - int(bbox[2]), int(bbox[1]), int(bbox[3])
+        chars.append(char)
+        boxes.append(boxCoords)
+
+    labels = chars, boxes
+    return labels
+
+
+
+
+
+
+
