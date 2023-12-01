@@ -5,9 +5,9 @@ author: C. R. Kelly
 email: CK598@cam.ac.uk
 
 """
-from projectFinal.io import importImage, exportComponent
-from projectFinal.actions import wireScanHough, objectDetection, junctionDetection
-from projectFinal.ocr import OCRComponents
+from CircuitSchematicImageInterpreter.io import importImage, exportComponent
+from CircuitSchematicImageInterpreter.actions import wireScanHough, objectDetection, junctionDetection
+from CircuitSchematicImageInterpreter.ocr import OCRComponents
 
 
 # Path to circuit image
