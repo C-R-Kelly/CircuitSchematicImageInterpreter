@@ -18,32 +18,18 @@
 	To configure this package, all configuration parameters and their uses can be found in: "config.py"
 
 
-
-	####################
-	#                  # 
-	#  Pre-Requisites  #
-	#                  #
-	####################
-
-	This package utilises the following software:
-
-	#	Python 3.X
-	# 	Tesseract OCR
-
-	This package utilises the following python packages:
-
-	# 	Matplotlib
-	#	NetworkX
-	# 	NumPy	
-	#	Pillow
-	#	Pytesseract
-	#	Scikit-Image
-	# 	SciPy
-	#	SymPy
+	##################
+	#                #   
+	#  Installation  #  
+	#                #    
+	##################
 
 
-
-
+	Install using pip:
+	
+	- pip install git+https://github.com/C-R-Kelly/CircuitSchematicImageInterpreter
+	
+	
 	###########
 	#         #        
 	#  Usage  #  
@@ -183,12 +169,26 @@
 	#	G.getIMatrix(Graph, Reduced=True, returnRefVertex=False)		|  Returns the incidence matrix of the graph object, Graph. If Reduced=True, the incidence matrix will be reduced. If returnRefVetex=True, it will return the vetex removed from the reduced incidence matrix
 	#	G.getSpanningTree(draw=False)						|  Returns the spanning tree of the network graph. If draw=True, the spanning tree will be plotted using Matplotlib
 	#	G.getCoTree(draw=False)							|  Returns the cotree of the network graph. If draw=True, the cotree will be plotted using Matplotlib
+	
+
+	### Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error ###
+	### Warning: 
 	#	G.getFundamentalMatrices()						|  Returns the fundamental cut-set and cycle matrices, Df and Cf
 	#	G.linEquations()							|  Returns the fundamental cut-set and cycle equations in matrix form
 	#	G.componentMatrix(components)						|  Returns the component matrix accounting for components that have associated linear equations, the combined voltage/current column vector and the result column vector
+	
+	# 	Warning: If the H matrix is very large, finding the inverse of H to solve the matrix equation can take an extremely long time to calculate
 	#	G.getComponentEquations(matrices=False)					|  Returns the solved matrix equation of H^-1.y = x where H is the component matrix, y is the result column vector and x is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If matrices=True, matrices H, x and y are also returned
 
 
 	### Notes: G.Df and G.Cf are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through G.getFundamentalMatrices().
+		 : Currently, the only supported components for the component matrix are resistors, inductors and capacitors. Therefore, to make use of the solving of this matrix equation, the circuit can only contain these components + sources. Further, if OCR does not identify these components correctly, the matrix equation will likely fail and throw an error. 
+	
+		
 
-
+	SPICE SIMULATION
+	
+	
+	To create a SPICE netlist, use:
+	
+	# createNetList(image, components)						|  Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as <image_name>_netlist.txt by default. File extension can be configured in config.py. Netlist uses nodes from network graph, so that must be generated first.
