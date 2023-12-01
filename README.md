@@ -172,7 +172,7 @@
 	
 
 	### Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error ###
-	### Warning: 
+
 	#	G.getFundamentalMatrices()						|  Returns the fundamental cut-set and cycle matrices, Df and Cf
 	#	G.linEquations()							|  Returns the fundamental cut-set and cycle equations in matrix form
 	#	G.componentMatrix(components)						|  Returns the component matrix accounting for components that have associated linear equations, the combined voltage/current column vector and the result column vector
