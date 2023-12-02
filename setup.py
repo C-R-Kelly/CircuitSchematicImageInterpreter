@@ -10,7 +10,7 @@ else:
 
 setup(
     name='CircuitSchematicImageInterpreter',
-    version='1.0',
+    version='1.0.0',
     author='Charles R. Kelly',
     author_email='CK598@cam.ac.uk',
     license='MIT',
