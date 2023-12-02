@@ -99,9 +99,9 @@ def wireDetect(border1, border2, wire, threshold=config.threshold):
     border1Size = np.size(border1)
     border2Size = np.size(border2)
     wireSize = np.size(wire)
-    b1Sum = np.float(np.sum(border1))
-    b2Sum = np.float(np.sum(border2))
-    wireSum = np.float(np.sum(wire))
+    b1Sum = float(np.sum(border1))
+    b2Sum = float(np.sum(border2))
+    wireSum = float(np.sum(wire))
 
     # if b1Sum / border1Size <= threshold and b2Sum / border2Size <= threshold and wireSum / wireSize == 1:
     if border1Size > 0 and border2Size > 0:
