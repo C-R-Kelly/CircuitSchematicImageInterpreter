@@ -28,6 +28,6 @@ setup(
         'pillow>=8.4.0',
         'scikit-image>=0.18.3',
         'scipy>=1.7.3',
-        'sympy>=1.9',
+        'sympy>=1.13.dev0',
     ],
 )
