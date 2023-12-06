@@ -10,6 +10,7 @@ email: CK598@cam.ac.uk
 """
 from sympy import nsimplify
 from sympy.matrices import Matrix
+from sympy.polys.matrices import DomainMatrix
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import networkx as nx
@@ -516,8 +517,11 @@ class Graph:
 
     def getComponentEquations(self, components, matrices=False):
         H, x, y = self.componentMatrix(components)
+        Hi, den = H.to_DM().inv_den()
+        H_Inverted = (Hi.to_field() / den).to_Matrix()
+
         componentEquations = Matrix.hstack(
-            (nsimplify(Matrix(np.identity(2 * len(components))) * (H.inv() * y)).evalf(3)),
+            (nsimplify(Matrix(np.identity(2 * len(components))) * (H_Inverted * y)).evalf(3)),
             Matrix(x)).evalf(3)
         if matrices:
             return H, x, y, componentEquations
