@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # Circuit Schematic Image Interpreter
+
 	############################
 	#                          #
 	#  author: C. R. Kelly     #
@@ -15,13 +15,10 @@
 	To show how this package can be utilised, an example script has been included: "example script.py"
 
 	To configure this package, all configuration parameters and their uses can be found in: "config.py"
-
-
-	##################
-	#                #   
-	#  Installation  #  
-	#                #    
-	##################
+	
+	## Installation    
+	 
+	
 
 
 	Install using pip:
