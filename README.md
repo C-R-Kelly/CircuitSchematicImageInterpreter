@@ -1,8 +1,8 @@
 # Circuit Schematic Image Interpreter
 
 
-Author: C. R. Kelly     
-Email: CK598@cam.ac.uk  
+**Author:** __C. R. Kelly__     
+**Email:** __CK598@cam.ac.uk__  
 
 
 	
