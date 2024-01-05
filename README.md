@@ -29,12 +29,14 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 
 ### Images
-To import an image into the program and convert it into greyscale use:
+
+**To import an image into the program and convert it into greyscale use:**
 	
 `image = io.importImage(path)`
 	
 
-Various attributes of the image can then be pulled:
+
+**Various attributes of the image can then be pulled:**
 
 `image.name` will return the file name.
 
@@ -52,7 +54,7 @@ Various attributes of the image can then be pulled:
 	
 `image.getBorder()` will return the bounding box of the image.
 
-#### All display functions can be called directly off of each other. E.g., image.displayBinaryImage().plotComponents().plotWires().plotJunctions() ###
+**All display functions can be called directly off of each other. E.g., image.displayBinaryImage().plotComponents().plotWires().plotJunctions()**
 
 `image.displayImage()` will plot the image in Matplotlib.
 
@@ -70,13 +72,15 @@ Various attributes of the image can then be pulled:
 
 	
 
-
-### To obtain the wires in the image use:
+### Wires
+**To obtain the wires in the image use:**
 
 `HorizWires, VertWires = actions.wireScanHough(image)` will return two lists containing all found horizontal and vertical wires respectively.
 	
 
-### Attributes of any wire in the list can then be pulled:
+
+**Attributes of any wire in the list can then be pulled:**
+
 
 `HorizWires[n].wire` will return a cropped segment of the binary image containing the wire.
 
@@ -94,12 +98,13 @@ Various attributes of the image can then be pulled:
 
 
 
+### Components
 
-### To obtain a list of found components in the image use:
+**To obtain a list of found components in the image use:**
 	
 `Components = actions.objectDetection(HorizWires, VertWires)` will return a list of all found components in the image.
 
-### Attributes of any component in the list can then be pulled:
+**Attributes of any component in the list can then be pulled:**
 
 `Components[n].path` will return the path of the saved component image, if it has been exported.
 
@@ -129,13 +134,13 @@ Various attributes of the image can then be pulled:
 
 
 
-
-### To obtain a list of found junctions in the image use:
+### Junctions
+**To obtain a list of found junctions in the image use:**
 	
 Junctions = actions.junctionDetection(HorizWires, VertWires) will return a list of all found junctions in the image.
 
 
-### Attributes of any junction in the list can then be pulled:
+**Attributes of any junction in the list can then be pulled:**
 
 `Junctions[n].id` will return the unique id of the junction which is a letter A-Z.
 
@@ -159,8 +164,8 @@ Junctions = actions.junctionDetection(HorizWires, VertWires) will return a list 
 
 
 
-
-### To identify a list of found components using OCR, first the components must be exported as individual images. For this use:
+### OCR Component Identification
+**To identify a list of found components using OCR, first the components must be exported as individual images. For this use:**
 
 `io.exportComponent(image, Components)`
 
@@ -170,19 +175,20 @@ Then, the indivual component images can be put together to form a single compone
 
 
 
+### Network Graphs
 
-### A network graph of the circuit can now be generated. To pull the NetworkX graph object use:
+**A network graph of the circuit can now be generated. To pull the NetworkX graph object use:**
 	
 `G = image.getNetworkGraph(Junctions, Components, draw=True)` If draw is set to True, the network graph will be plotted using Matplotlib.
 
-### Other graphs can also be plotted using:
+**Other graphs can also be plotted using:**
 
 ```
 G.getCoTree(draw=True)
 G.getSpanningTree(draw=True)
 ```
 
-### Graph attributes can then be pulled using:
+**Graph attributes can then be pulled using:**
 	
 `G.componentList` will return the list of components used to form the graph edges.
 
@@ -215,7 +221,7 @@ G.getSpanningTree(draw=True)
 `G.getCoTree(draw=False)` will return the cotree of the network graph. If draw=True, the cotree will be plotted using Matplotlib.
 	
 
-### Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error 
+**Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error**
 
 `G.getFundamentalMatrices()` will return the fundamental cut-set and cycle matrices, `Df` and `Cf`.
 
@@ -223,20 +229,20 @@ G.getSpanningTree(draw=True)
 
 `G.componentMatrix(components)` will return the component matrix accounting for components that have associated linear equations, the combined voltage/current column vector and the result column vector.
 	
-Warning: If the `H` matrix is very large, finding the inverse of `H` to solve the matrix equation can take an extremely long time to calculate
+**Warning: If the `H` matrix is very large, finding the inverse of `H` to solve the matrix equation can take an extremely long time to calculate**
 
 `G.getComponentEquations(matrices=False)` will return the solved matrix equation of H^-1.y = x where `H` is the component matrix, `y` is the result column vector and `x` is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If `matrices=True`, matrices `H`, `x` and `y` are also returned.
 
 
-Notes: `G.Df` and `G.Cf` are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through `G.getFundamentalMatrices()`.
+**Notes: `G.Df` and `G.Cf` are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through `G.getFundamentalMatrices()`.**
 
-Currently, the only supported components for the component matrix are resistors, inductors and capacitors. Therefore, to make use of the solving of this matrix equation, the circuit can only contain these components + sources. Further, if OCR does not identify these components correctly, the matrix equation will likely fail and throw an error. 
+**Currently, the only supported components for the component matrix are resistors, inductors and capacitors. Therefore, to make use of the solving of this matrix equation, the circuit can only contain these components + sources. Further, if OCR does not identify these components correctly, the matrix equation will likely fail and throw an error.**
 	
 		
 
-## SPICE SIMULATION
+### SPICE SIMULATION
 	
 	
-### To create a SPICE netlist, use:
+**To create a SPICE netlist, use:**
 	
 `createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as <image_name>_netlist.txt by default. File extension can be configured in config.py. Netlist uses nodes from network graph, so that must be generated first.
