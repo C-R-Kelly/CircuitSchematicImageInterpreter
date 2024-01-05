@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-
+# Circuit Schematic Image Interpreter
 	############################
 	#                          #
 	#  author: C. R. Kelly     #
