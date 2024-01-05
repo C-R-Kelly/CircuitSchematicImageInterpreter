@@ -54,32 +54,43 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 #### All display functions can be called directly off of each other. E.g., image.displayBinaryImage().plotComponents().plotWires().plotJunctions() ###
 
-`image.displayImage()`							|  Plots image in Matplotlib
-`image.displayBinaryImage()`						|  Plots binary image in matplotlib
-`image.displayBinarySkeleton()`						|  Plots binarised skeletonised image in Matplotlib
-`image.plotComponents(Components, image)` 				|  Plots ROIs on open image in matplotlib as a red bounding box + a red dot at the centroid
-`image.plotWires(HorizWires, VertWires)`  				|  Plots horizontal and vertical wires on an image open in Matplotlib
-`image.plotJunctions(Junctions, Letters=True)` 				|  Plots found junctions in matplotlib as a green dot. If Letters=True, a blue letter will also appear next to the junction. Letters go from A-Z
-`image.plotAll(Junctions, Components, HorizWires, VertWires, image)`	|  Plots image in matplotlib with all found junctions, components, horizontal wires and vertical wires. Returns NetworkX graph object
+`image.displayImage()` will plot the image in Matplotlib.
+
+`image.displayBinaryImage()` will plot the binary image in matplotlib.
+
+`image.displayBinarySkeleton()`	will plot the binarised skeletonised image in Matplotlib.
+
+`image.plotComponents(Components, image)` will plot the ROIs on open image in matplotlib as a red bounding box + a red dot at the centroid.
+
+`image.plotWires(HorizWires, VertWires)` will plot the horizontal and vertical wires on an image open in Matplotlib.
+
+`image.plotJunctions(Junctions, Letters=True)` will plot the found junctions in matplotlib as a green dot. If Letters=True, a blue letter will also appear next to the junction. Letters go from A-Z.
+
+`image.plotAll(Junctions, Components, HorizWires, VertWires, image)` will plot the image in matplotlib with all found junctions, components, horizontal wires and vertical wires. Returns NetworkX graph object.
 
 	
 
 
 ### To obtain the wires in the image use:
 
-`HorizWires, VertWires = actions.wireScanHough(image)`			|  Returns two lists containing all found horizontal and vertical wires respectively
+`HorizWires, VertWires = actions.wireScanHough(image)` will return two lists containing all found horizontal and vertical wires respectively.
 	
 
 ### Attributes of any wire in the list can then be pulled:
 
-`HorizWires[n].wire`							|  Returns a cropped segment of the binary image containing the wire
-`HorizWires[n].length`							|  Returns the length of the wire in pixels
-`HorizWires[n].centre`    						|  Returns the centre coordinates of the wire
-`HorizWires[n].line`							|  Returns the coordinates of the start and end points of the wire as: y1, y2, x1, x2
-`HorizWires[n].start`							|  Returns the coordinates of the start point of the wire as: y, x
-`HorizWires[n].end`							|  Returns the coordinates of the end point of the wire as: y, x
+`HorizWires[n].wire` will return a cropped segment of the binary image containing the wire.
 
-`HorizWires[n].getBorder()`						|  Returns the bounding box of the wire as: top, bottom, left, right
+`HorizWires[n].length` will return the length of the wire in pixels.
+
+`HorizWires[n].centre` will return the centre coordinates of the wire.
+
+`HorizWires[n].line` will return the coordinates of the start and end points of the wire as: y1, y2, x1, x2.
+
+`HorizWires[n].start` will return the coordinates of the start point of the wire as: y, x.
+
+`HorizWires[n].end` will return the coordinates of the end point of the wire as: y, x.
+
+`HorizWires[n].getBorder()` will return the bounding box of the wire as: top, bottom, left, right.
 
 
 
