@@ -1,8 +1,8 @@
 # Circuit Schematic Image Interpreter
 
 
-**Author:** * *C. R. Kelly* *     
-**Email:** * *CK598@cam.ac.uk* * 
+**Author:** *C. R. Kelly*   
+**Email:** *CK598@cam.ac.uk* 
 
 
 	
@@ -28,13 +28,13 @@ Circuit Schematic Image Interpreter can be installed using pip.
 ## Usage  
 
 
-
-### To import an image into the program and convert it into greyscale use:
+### Images
+To import an image into the program and convert it into greyscale use:
 	
 `image = io.importImage(path)`
 	
 
-### Various attributes of the image can then be pulled:
+Various attributes of the image can then be pulled:
 
 `image.name` will return the file name.
 
