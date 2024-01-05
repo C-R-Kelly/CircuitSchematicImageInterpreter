@@ -66,7 +66,7 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 `image.plotWires(HorizWires, VertWires)` will plot the horizontal and vertical wires on an image open in Matplotlib.
 
-`image.plotJunctions(Junctions, Letters=True)` will plot the found junctions in matplotlib as a green dot. If Letters=True, a blue letter will also appear next to the junction. Letters go from A-Z.
+`image.plotJunctions(Junctions, Letters=True)` will plot the found junctions in matplotlib as a green dot. If `Letters=True`, a blue letter will also appear next to the junction. Letters go from A-Z.
 
 `image.plotAll(Junctions, Components, HorizWires, VertWires, image)` will plot the image in matplotlib with all found junctions, components, horizontal wires and vertical wires. Returns NetworkX graph object.
 
@@ -88,13 +88,13 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 `HorizWires[n].centre` will return the centre coordinates of the wire.
 
-`HorizWires[n].line` will return the coordinates of the start and end points of the wire as: y1, y2, x1, x2.
+`HorizWires[n].line` will return the coordinates of the start and end points of the wire as: `y1, y2, x1, x2`.
 
-`HorizWires[n].start` will return the coordinates of the start point of the wire as: y, x.
+`HorizWires[n].start` will return the coordinates of the start point of the wire as: `y, x`.
 
-`HorizWires[n].end` will return the coordinates of the end point of the wire as: y, x.
+`HorizWires[n].end` will return the coordinates of the end point of the wire as: `y, x`.
 
-`HorizWires[n].getBorder()` will return the bounding box of the wire as: top, bottom, left, right.
+`HorizWires[n].getBorder()` will return the bounding box of the wire as: `top, bottom, left, right`.
 
 
 
@@ -110,9 +110,9 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 `Components[n].id` will return the unique integer id of the component.
 
-`Components[n].centroid` will return the centroid coordinates of the component as y1, x1.
+`Components[n].centroid` will return the centroid coordinates of the component as `y1, x1`.
 
-`Components[n].centroidY, Components[n].centroidX` will return the y or x centroid coorindate of the component.
+`Components[n].centroidY, Components[n].centroidX` will return the `y` or `x` centroid coorindate of the component.
 
 `Components[n].Height` will return the height of the bounding box of the component in pixels.
 
@@ -128,29 +128,29 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 `Components[n].unichar`	If OCR has been performed on all the components in the image, this returns the unichar of the component it was identified as.
 
-`Components[n].terminalNo` If OCR has been performed on all the components in the image, this returns the number of terminals of the component it was identified as. If no OCR has been performed, this value defaults to 2.
+`Components[n].terminalNo` If OCR has been performed on all the components in the image, this returns the number of terminals of the component it was identified as. If no OCR has been performed, this value defaults to `2`.
 
-`Components[n].getRegion(image)` will return the bounding box of the component as top, bottom, left, right.
+`Components[n].getRegion(image)` will return the bounding box of the component as `top, bottom, left, right`.
 
 
 
 ### Junctions
 **To obtain a list of found junctions in the image use:**
 	
-Junctions = actions.junctionDetection(HorizWires, VertWires) will return a list of all found junctions in the image.
+`Junctions = actions.junctionDetection(HorizWires, VertWires)` will return a list of all found junctions in the image.
 
 
 **Attributes of any junction in the list can then be pulled:**
 
-`Junctions[n].id` will return the unique id of the junction which is a letter A-Z.
+`Junctions[n].id` will return the unique id of the junction which is a letter `A-Z`.
 
-`Junctions[n].id_node` will return the unique id of the node the junction corresponds to which is a letter A-Z.
+`Junctions[n].id_node` will return the unique id of the node the junction corresponds to which is a letter `A-Z`.
 
-`Junctions[n].centroid`	will return the centroid coordinates of the junction as: y1, x1.
+`Junctions[n].centroid`	will return the centroid coordinates of the junction as: `y1, x1`.
 
-`Junctions[n].directions` If the junction is a tri junction, this will return a value of N, S, E, or W which correpsonds the direction the intersecting wire is going. North means the intersecting wire is vertical and the horizontal wire is at the top of said vertical wire.
+`Junctions[n].directions` If the junction is a tri junction, this will return a value of `N, S, E, or W` which correpsonds the direction the intersecting wire is going. North means the intersecting wire is vertical and the horizontal wire is at the top of said vertical wire.
 
-`Junctions[n].type` will return the type of junction as 'Corner', 'Tri', or 'Quad'.
+`Junctions[n].type` will return the type of junction as `'Corner', 'Tri', or 'Quad'`.
 
 `Junctions[n].associatedHWires` will return a list of all horizontal wires passing through or connecting to the junction.
 
@@ -171,7 +171,7 @@ Junctions = actions.junctionDetection(HorizWires, VertWires) will return a list 
 
 Then, the indivual component images can be put together to form a single component line and OCR can then be performed on this line. For this use:
 
-`OCRComponents(components)` This will then assign all the relevant component parameters: Components[n].componentType, .unichar, .terminalNo.
+`OCRComponents(components)` This will then assign all the relevant component parameters: `Components[n].componentType, .unichar, .terminalNo`.
 
 
 
@@ -212,13 +212,13 @@ G.getSpanningTree(draw=True)
 
 `G.Df, G.Cf` If the fundamental cut-set and cycle matrices have been generated using.
 
-`G.getFundamentalMatrices()`, they can be pulled here.
+`G.getFundamentalMatrices()` will return the fundamental matrices.
 
 `G.getIMatrix(Graph, Reduced=True, returnRefVertex=False)` will return the incidence matrix of the graph object, Graph. If Reduced=True, the incidence matrix will be reduced. If returnRefVetex=True, it will return the vetex removed from the reduced incidence matrix.
 
-`G.getSpanningTree(draw=False)` will return the spanning tree of the network graph. If draw=True, the spanning tree will be plotted using Matplotlib.
+`G.getSpanningTree(draw=False)` will return the spanning tree of the network graph. If `draw=True`, the spanning tree will be plotted using Matplotlib.
 
-`G.getCoTree(draw=False)` will return the cotree of the network graph. If draw=True, the cotree will be plotted using Matplotlib.
+`G.getCoTree(draw=False)` will return the cotree of the network graph. If `draw=True`, the cotree will be plotted using Matplotlib.
 	
 
 **Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error**
@@ -245,4 +245,4 @@ G.getSpanningTree(draw=True)
 	
 **To create a SPICE netlist, use:**
 	
-`createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as <image_name>_netlist.txt by default. File extension can be configured in config.py. Netlist uses nodes from network graph, so that must be generated first.
+`createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as `<image_name>_netlist.txt` by default. File extension can be configured in `config.py`. Netlist uses nodes from network graph, so that must be generated first.
