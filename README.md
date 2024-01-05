@@ -97,45 +97,65 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 ### To obtain a list of found components in the image use:
 	
-`Components = actions.objectDetection(HorizWires, VertWires)`		|  Returns a list of all found components in the image
+`Components = actions.objectDetection(HorizWires, VertWires)` will return a list of all found components in the image.
 
 ### Attributes of any component in the list can then be pulled:
 
-`Components[n].path`							|  Returns the path of the saved component image, if it has been exported
-`Components[n].id`							|  Returns the unique integer id of the component 
-`Components[n].centroid`							|  Returns the centroid coordinates of the component as y1, x1
-`Components[n].centroidY, Components[n].centroidX`			|  Returns the y or x centroid coorindate of the component
-`Components[n].Height`							|  Returns the height of the bounding box of the component in pixels
-`Components[n].Width`							|  Returns the width of the bounding box of the component in pixels
-`Components[n].isVert`							|  Returns a boolean value of whether the component was found between two horizontal (False) or vertical (True) wires
-`Components[n].associatedHWires`						|  If the component is horizontal, this returns a list of the two connecting horizontal wires
-`Components[n].associatedVWires`					|  If the component is vertical, this returns a list of the two connecting vertical wires
-`Components[n].componentType`						|  If OCR has been performed on all the components in the image, this returns a string of the component it was identified as
-`Components[n].unichar`							|  If OCR has been performed on all the components in the image, this returns the unichar of the component it was identified as
-`Components[n].terminalNo`						|  If OCR has been performed on all the components in the image, this returns the number of terminals of the component it was identified as. If no OCR has been performed, this value defaults to 2
+`Components[n].path` will return the path of the saved component image, if it has been exported.
 
-`Components[n].getRegion(image)`						|  Returns the bounding box of the component as top, bottom, left, right
+`Components[n].id` will return the unique integer id of the component.
+
+`Components[n].centroid` will return the centroid coordinates of the component as y1, x1.
+
+`Components[n].centroidY, Components[n].centroidX` will return the y or x centroid coorindate of the component.
+
+`Components[n].Height` will return the height of the bounding box of the component in pixels.
+
+`Components[n].Width` will return the width of the bounding box of the component in pixels.
+
+`Components[n].isVert` will return a boolean value of whether the component was found between two horizontal (False) or vertical (True) wires.
+
+`Components[n].associatedHWires` If the component is horizontal, this returns a list of the two connecting horizontal wires.
+
+`Components[n].associatedVWires` If the component is vertical, this returns a list of the two connecting vertical wires.
+
+`Components[n].componentType` If OCR has been performed on all the components in the image, this returns a string of the component it was identified as.
+
+`Components[n].unichar`	If OCR has been performed on all the components in the image, this returns the unichar of the component it was identified as.
+
+`Components[n].terminalNo` If OCR has been performed on all the components in the image, this returns the number of terminals of the component it was identified as. If no OCR has been performed, this value defaults to 2.
+
+`Components[n].getRegion(image)` will return the bounding box of the component as top, bottom, left, right.
 
 
 
 
 ### To obtain a list of found junctions in the image use:
 	
-Junctions = actions.junctionDetection(HorizWires, VertWires)		|  Returns a list of all found junctions in the image
+Junctions = actions.junctionDetection(HorizWires, VertWires) will return a list of all found junctions in the image.
 
 
 ### Attributes of any junction in the list can then be pulled:
 
-`Junctions[n].id`								|  Returns the unique id of the junction which is a letter A-Z
-`Junctions[n].id_node`							|  Returns the unique id of the node the junction corresponds to which is a letter A-Z
-`Junctions[n].centroid`							|  Returns the centroid coordinates of the junction as: y1, x1
-`Junctions[n].directions`							|  If the junction is a tri junction, this will return a value of N, S, E, or W which correpsonds the direction the intersecting wire is going. North means the intersecting wire is vertical and the horizontal wire is at the top of said vertical wire
-`Junctions[n].type`							|  Returns the type of junction as 'Corner', 'Tri', or 'Quad'
-`Junctions[n].associatedHWires`						|  Returns a list of all horizontal wires passing through or connecting to the junction
-`Junctions[n].associatedVWires`						|  Returns a list of all vertical wires passing through or connecting to the junction
-`Junctions[n].isNode`							|  Returns a boolean value of whether the junction is a node or whether it merges to another node
-`Junctions[n].connectedNodesH`						|  Returns a list of all other junctions that connect directly to this junction by a horizontal wire
-`Junctions[n].connectedNodesV`           					|  Returns a list of all other junctions that connect directly to this junction by a vertical wire
+`Junctions[n].id` will return the unique id of the junction which is a letter A-Z.
+
+`Junctions[n].id_node` will return the unique id of the node the junction corresponds to which is a letter A-Z.
+
+`Junctions[n].centroid`	will return the centroid coordinates of the junction as: y1, x1.
+
+`Junctions[n].directions` If the junction is a tri junction, this will return a value of N, S, E, or W which correpsonds the direction the intersecting wire is going. North means the intersecting wire is vertical and the horizontal wire is at the top of said vertical wire.
+
+`Junctions[n].type` will return the type of junction as 'Corner', 'Tri', or 'Quad'.
+
+`Junctions[n].associatedHWires` will return a list of all horizontal wires passing through or connecting to the junction.
+
+`Junctions[n].associatedVWires` will return a list of all vertical wires passing through or connecting to the junction.
+
+`Junctions[n].isNode` will return Returns a boolean value of whether the junction is a node or whether it merges to another node.
+
+`Junctions[n].connectedNodesH` will return Returns a list of all other junctions that connect directly to this junction by a horizontal wire.
+
+`Junctions[n].connectedNodesV` will return a list of all other junctions that connect directly to this junction by a vertical wire.
 
 
 
@@ -146,14 +166,14 @@ Junctions = actions.junctionDetection(HorizWires, VertWires)		|  Returns a list 
 
 Then, the indivual component images can be put together to form a single component line and OCR can then be performed on this line. For this use:
 
-`OCRComponents(components)`						| This will then assign all the relevant component parameters: Components[n].componentType, .unichar, .terminalNo
+`OCRComponents(components)` This will then assign all the relevant component parameters: Components[n].componentType, .unichar, .terminalNo.
 
 
 
 
 ### A network graph of the circuit can now be generated. To pull the NetworkX graph object use:
 	
-`G = image.getNetworkGraph(Junctions, Components, draw=True)`		|  If draw is set to True, the network graph will be plotted using Matplotlib
+`G = image.getNetworkGraph(Junctions, Components, draw=True)` If draw is set to True, the network graph will be plotted using Matplotlib.
 
 ### Other graphs can also be plotted using:
 
@@ -164,31 +184,48 @@ G.getSpanningTree(draw=True)
 
 ### Graph attributes can then be pulled using:
 	
-`G.componentList`								|  Returns the list of components used to form the graph edges
-`G.graph`									|  Returns the NetworkX graph object of the network graph
-`G.nodes`									|  Returns the list of nodes for the network graph
-`G.edges`									|  Returns the list of edges for the network graph
-`G.SP`									|  Returns the NetworkX graph object for the spanning tree of the graph
-`G.CH`									|  Returns the NetworkX graph object for the cotree of the graph
-`G.Bt`									|  Returns the reduced incidence matrix of the spanning tree
-`G.Bc`									|  Returns the reduced incidence matrix of the cotree
-`G.referenceVertexSP`							|  Returns the removed vertex of the incidence matrix for the spanning tree
-`G.referenceVertexCH`							|  Returns the removed vertex of the incidence matrix for the cotree
-`G.Df, G.Cf`								|  If the fundamental cut-set and cycle matrices have been generated using `G.getFundamentalMatrices()`, they can be pulled here
+`G.componentList` will return the list of components used to form the graph edges.
 
-`G.getIMatrix(Graph, Reduced=True, returnRefVertex=False)`		|  Returns the incidence matrix of the graph object, Graph. If Reduced=True, the incidence matrix will be reduced. If returnRefVetex=True, it will return the vetex removed from the reduced incidence matrix
-`G.getSpanningTree(draw=False)`						|  Returns the spanning tree of the network graph. If draw=True, the spanning tree will be plotted using Matplotlib
-`G.getCoTree(draw=False)`							|  Returns the cotree of the network graph. If draw=True, the cotree will be plotted using Matplotlib
+`G.graph` will return the NetworkX graph object of the network graph.
+
+`G.nodes` will return the list of nodes for the network graph.
+
+`G.edges` will return the list of edges for the network graph.
+
+`G.SP` will return the NetworkX graph object for the spanning tree of the graph.
+
+`G.CH` will return the NetworkX graph object for the cotree of the graph.
+
+`G.Bt` will return the reduced incidence matrix of the spanning tree.
+
+`G.Bc` will return the reduced incidence matrix of the cotree.
+
+`G.referenceVertexSP` will return the removed vertex of the incidence matrix for the spanning tree.
+
+`G.referenceVertexCH` will return the removed vertex of the incidence matrix for the cotree.
+
+`G.Df, G.Cf` If the fundamental cut-set and cycle matrices have been generated using.
+
+`G.getFundamentalMatrices()`, they can be pulled here.
+
+`G.getIMatrix(Graph, Reduced=True, returnRefVertex=False)` will return the incidence matrix of the graph object, Graph. If Reduced=True, the incidence matrix will be reduced. If returnRefVetex=True, it will return the vetex removed from the reduced incidence matrix.
+
+`G.getSpanningTree(draw=False)` will return the spanning tree of the network graph. If draw=True, the spanning tree will be plotted using Matplotlib.
+
+`G.getCoTree(draw=False)` will return the cotree of the network graph. If draw=True, the cotree will be plotted using Matplotlib.
 	
 
 ### Warning: The following matricies rely on correct OCR, circuit segmentation, and a circuit where these matrices mathematically exist. Failure to meet these conditions may throw an error 
 
-`G.getFundamentalMatrices()`						|  Returns the fundamental cut-set and cycle matrices, `Df` and `Cf`
-`G.linEquations()`							|  Returns the fundamental cut-set and cycle equations in matrix form
-`G.componentMatrix(components)`						|  Returns the component matrix accounting for components that have associated linear equations, the combined voltage/current column vector and the result column vector
+`G.getFundamentalMatrices()` will return the fundamental cut-set and cycle matrices, `Df` and `Cf`.
+
+`G.linEquations()` will return the fundamental cut-set and cycle equations in matrix form.
+
+`G.componentMatrix(components)` will return the component matrix accounting for components that have associated linear equations, the combined voltage/current column vector and the result column vector.
 	
 Warning: If the `H` matrix is very large, finding the inverse of `H` to solve the matrix equation can take an extremely long time to calculate
-`G.getComponentEquations(matrices=False)`					|  Returns the solved matrix equation of H^-1.y = x where `H` is the component matrix, `y` is the result column vector and `x` is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If `matrices=True`, matrices `H`, `x` and `y` are also returned
+
+`G.getComponentEquations(matrices=False)` will return the solved matrix equation of H^-1.y = x where `H` is the component matrix, `y` is the result column vector and `x` is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If `matrices=True`, matrices `H`, `x` and `y` are also returned.
 
 
 Notes: `G.Df` and `G.Cf` are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through `G.getFundamentalMatrices()`.
@@ -202,4 +239,4 @@ Currently, the only supported components for the component matrix are resistors,
 	
 ### To create a SPICE netlist, use:
 	
-`createNetList(image, components)`						|  Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as <image_name>_netlist.txt by default. File extension can be configured in config.py. Netlist uses nodes from network graph, so that must be generated first.
+`createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as <image_name>_netlist.txt by default. File extension can be configured in config.py. Netlist uses nodes from network graph, so that must be generated first.
