@@ -183,10 +183,10 @@ Then, the indivual component images can be put together to form a single compone
 
 **Other graphs can also be plotted using:**
 
-```
-G.getCoTree(draw=True)
-G.getSpanningTree(draw=True)
-```
+
+`G.getCoTree(draw=True)`
+`G.getSpanningTree(draw=True)`
+
 
 **Graph attributes can then be pulled using:**
 	
@@ -231,7 +231,7 @@ G.getSpanningTree(draw=True)
 	
 **Warning: If the `H` matrix is very large, finding the inverse of `H` to solve the matrix equation can take an extremely long time to calculate**
 
-`G.getComponentEquations(matrices=False)` will return the solved matrix equation of H^-1.y = x where `H` is the component matrix, `y` is the result column vector and `x` is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If `matrices=True`, matrices `H`, `x` and `y` are also returned.
+`G.getComponentEquations(matrices=False)` will return the solved matrix equation of `H^-1.y = x` where `H` is the component matrix, `y` is the result column vector and `x` is the voltage/current column vector. The return format is a matrix of the equation for each voltage and current value in the combined column vector. If `matrices=True`, matrices `H`, `x` and `y` are also returned.
 
 
 **Notes: `G.Df` and `G.Cf` are not obtained automatically when a graph class instance is created as, if the fundamental matrices do not exist for your circuit / what is detected of your circuit then an error will be thrown. Thus these are obtained manually through `G.getFundamentalMatrices()`.**
