@@ -9,7 +9,7 @@
 A configurable python package to segment a circuit diagram into its components, junctions and wires, identify the components using OCR, use this information to plot network graphs of the circuit and obtain & solve the fundamental matrices to obtain equations for voltages and currents at any point in the circuit.
 
 
-To show how this package can be utilised, an example script has been included: (/example script.py)
+To show how this package can be utilised, an example script has been included: [example scipt.py](/example script.py)
 
 To configure this package, all configuration parameters and their uses can be found in: CircuitSchematicImageInterpreter/config.py
 	
