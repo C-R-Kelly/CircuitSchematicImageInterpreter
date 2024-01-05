@@ -36,21 +36,21 @@ Circuit Schematic Image Interpreter can be installed using pip.
 
 ### Various attributes of the image can then be pulled:
 
-`image.name`  								|  Returns the file name 
+`image.name` will return the file name.
 
-`image.image` 								|  Returns the greyscale converted image as a NumPy array
+`image.image` will return the greyscale converted image as a NumPy array.
 
-`image.binaryImage` 							|  Returns a binarised copy of the image
+`image.binaryImage` will return a binarised copy of the image.
 
-`image.binarySkeleton` 							|  Returns a binarised skeletonised copy of the image
+`image.binarySkeleton`will return a binarised skeletonised copy of the image.
 
-`image.centre, image.width, image.height`					|  Returns the centroid of the image and the width & height in pixels
+`image.centre, image.width, image.height` will return Returns the centroid of the image and the width & height in pixels.
 
-`image.size`  								|  Returns the size of the image in pixels
+`image.size` will return the size of the image in pixels.
 
-`image.path` 								|  Returns the file path of the image
+`image.path` will return the file path of the image.
 	
-`image.getBorder()`							|  Returns the bounding box of the image
+`image.getBorder()` will return the bounding box of the image.
 
 #### All display functions can be called directly off of each other. E.g., image.displayBinaryImage().plotComponents().plotWires().plotJunctions() ###
 
