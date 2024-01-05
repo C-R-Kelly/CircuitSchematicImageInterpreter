@@ -11,7 +11,7 @@ A configurable python package to segment a circuit diagram into its components, 
 
 To show how this package can be utilised, an example script has been included: [example scipt.py](/example script.py)
 
-To configure this package, all configuration parameters and their uses can be found in: CircuitSchematicImageInterpreter/config.py
+To configure this package, all configuration parameters and their uses can be found in: [config.py](/CircuitSchematicImageInterpreter/CircuitSchematicImageInterpreter/config.py)
 	
 ## Installation    
 	 
