@@ -184,8 +184,7 @@ Then, the indivual component images can be put together to form a single compone
 **Other graphs can also be plotted using:**
 
 
-`G.getCoTree(draw=True)`
-`G.getSpanningTree(draw=True)`
+`G.getCoTree(draw=True)` and `G.getSpanningTree(draw=True)`
 
 
 **Graph attributes can then be pulled using:**
