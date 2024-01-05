@@ -245,4 +245,4 @@ G.getSpanningTree(draw=True)
 	
 **To create a SPICE netlist, use:**
 	
-`createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as `<image_name>_netlist.txt` by default. File extension can be configured in `config.py`. Netlist uses nodes from network graph, so that must be generated first.
+`createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as `<image_name>_netlist.txt` by default. File extension can be configured in [config.py](/CircuitSchematicImageInterpreter//config.py)`. Netlist uses nodes from network graph, so that must be generated first.
