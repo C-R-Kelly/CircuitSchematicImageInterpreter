@@ -461,7 +461,7 @@ class Graph:
         matrixCounter = 0
         for edge in edgeList:
 
-            component_id = edge[2] - 1
+            component_id = edge[2]
             blank_matrix_1d = Matrix(np.zeros((1, len(edgeList))))
 
             if components[component_id].componentType == 'Resistor (EU)' or components[
