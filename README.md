@@ -3,7 +3,7 @@
 
 **Author:** ***C. R. Kelly***   
 **Email:** ***CK598@cam.ac.uk*** 
-**Paper:** ***[Digitizing images of electrical-circuit schematics](https://doi.org/10.1063/5.0177755)***
+**\nPaper:** ***[Digitizing images of electrical-circuit schematics](https://doi.org/10.1063/5.0177755)***
 
 
 	
@@ -246,4 +246,5 @@ Then, the indivual component images can be put together to form a single compone
 **To create a SPICE netlist, use:**
 	
 `createNetList(image, components)` Saves a SPICE netlist that can be imported into software such as LTSpice. Saves as `<image_name>_netlist.txt` by default. File extension can be configured in [config.py](/CircuitSchematicImageInterpreter//config.py). Netlist uses nodes from network graph, so that must be generated first.
+
 
